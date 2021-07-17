@@ -21,7 +21,6 @@ ws = wb.active
 lastrow = ws.max_row
 
 deve_conter = ['CANETA', 'MARCA-TEXTO']
-pode_conter = ['P1', 'P2'] 
 proibidas = ['P3', 'P4']
 
 for row in ws.iter_rows(min_row = 6, max_row = lastrow, max_col = 12):
@@ -29,7 +28,7 @@ for row in ws.iter_rows(min_row = 6, max_row = lastrow, max_col = 12):
     if any(x in descr for x in proibidas):
         continue
 
-    if all(x in descr for x in deve_conter) or (all(x in descr for x in deve_conter) and any(x in descr for x in pode_conter)):
+    if all(x in descr for x in deve_conter):
         color_row(row, 'e2f0d9')
 
 unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
