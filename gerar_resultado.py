@@ -33,8 +33,6 @@ for row in ws.iter_rows(min_row = 6, max_row = lastrow, max_col = 12):
         color_row(row, 'e2f0d9')
 
 unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
-meses = [int(cell[0].value.split('/')[1]) for cell in ws['L6':f'L{lastrow}']]
-anos = [int(cell[0].value.split('/')[2]) for cell in ws['L6':f'L{lastrow}']]
 
 mes_atual = date.today().month
 ano_atual = date.today().year
@@ -83,8 +81,3 @@ ws[f'B{lastrow + 5}'].border = thin_border
 ws[f'B{lastrow + 6}'].border = thin_border
 
 wb.save('resultado.xlsx')
-
-
-# row_tuple = ws[6]
-
-# color_row(row_tuple, 'e2f0d9')
