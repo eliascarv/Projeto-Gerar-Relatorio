@@ -120,9 +120,11 @@ for item in itens:
     ws_result = resultado.create_sheet(item_name)
     copy_sheet(ws, ws_result)
 
-    for row in ws_result.iter_rows(min_row = 6, max_row = lastrow, max_col = 13):
-        cell = row[12]
-        ativo = cell.value
+    for row, i in zip(ws_result.iter_rows(min_row = 6, max_row = lastrow, max_col = 13), range(0, lastrow - 5)):
+        cell_ativo = row[12]
+        cell_valor = row[7]
+        cell_valor.value = unit_values[i]
+        ativo = cell_ativo.value
         if ativo == 1:
             color_row(row, 'e2f0d9')
         else:
