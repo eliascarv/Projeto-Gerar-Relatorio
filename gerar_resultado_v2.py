@@ -34,6 +34,7 @@ def copy_sheet(ws_source, ws_destination):
 resultado = Workbook()
 itens = listdir('itens')
 
+descr_padrao = {'item1':'DESCRIÇÃO PADRÃO 1', 'item2':'DESCRIÇÃO PADRÃO 2'}
 deve_conter = {'item1':['CANETA', 'MARCA-TEXTO'], 'item2':['CANETA', 'MARCA-TEXTO']}
 proibidas = {'item1':['P3', 'P4'], 'item2':['P1', 'P2']}
 unid_forn = {'item1':['UNIDADE'], 'item2':['UNIDADE', 'CAIXA 12,00 UN']}
@@ -47,11 +48,14 @@ for item in itens:
     lastrow = ws.max_row
     item_name = item[0:-5]
 
+    descr_padrao_item = descr_padrao[item_name]
     deve_conter_item = deve_conter[item_name]
     proibidas_item = proibidas[item_name]
     unid_forn_item = unid_forn[item_name]
     cod_mat_item = cod_mat[item_name]
     periodo_item = periodo[item_name]
+
+    ws['C1'] = descr_padrao_item
 
     data_inicial = datetime.strptime(periodo_item[0], '%m/%Y')
     data_final = datetime.strptime(periodo_item[1], '%m/%Y')
