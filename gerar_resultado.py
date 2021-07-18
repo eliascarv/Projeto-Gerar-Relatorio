@@ -24,7 +24,6 @@ def color_row(row_tuple, color):
 def copy_sheet(ws_source, ws_destination):
     mr = ws_source.max_row
     mc = ws_source.max_column
-    
     for i in range (1, mr + 1):
         for j in range (1, mc + 1):
             c = ws_source.cell(row = i, column = j)
@@ -74,7 +73,7 @@ for item in itens:
         cod = cod_mat_cell.value
         unid = unid_forn_cell.value
         data = datetime.strptime(data_cell.value, '%d/%m/%Y')
-        
+
         if any(x in descr for x in proibidas_item):
             ws[f'M{i}'] = 0
         elif cod_mat_item:
