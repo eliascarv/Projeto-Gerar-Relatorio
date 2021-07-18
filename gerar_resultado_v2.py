@@ -1,7 +1,7 @@
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
 from statistics import mean, stdev, median
-from datetime import date
+from datetime import datetime
 from os import listdir
 
 thin_border = Border(
@@ -36,8 +36,8 @@ itens = listdir('itens')
 
 deve_conter = {'item1':['CANETA', 'MARCA-TEXTO'], 'item2':['CANETA', 'MARCA-TEXTO']}
 proibidas = {'item1':['P3', 'P4'], 'item2':['P1', 'P2']}
-unid_forn = {'item1':['UNIDADE'], 'item2':['TODOS']}
-cod_mat = {'item1':['TODOS'], 'item2':['279313']}
+unid_forn = {'item1':['UNIDADE'], 'item2':['UNIDADE', 'CAIXA 12,00 UN']}
+cod_mat = {'item1':[279313], 'item2':[279313]}
 periodo = {'item1':['07/2020', '07/2021'], 'item2':['10/2020', '05/2021']}
 
 for item in itens:
@@ -49,25 +49,29 @@ for item in itens:
 
     deve_conter_item = deve_conter[item_name]
     proibidas_item = proibidas[item_name]
+    unid_forn_item = unid_forn[item_name]
+    cod_mat_item = cod_mat[item_name]
+    periodo_item = periodo[item_name]
+
+    data_inicial = datetime.strptime(periodo_item[0], '%m/%Y')
+    data_final = datetime.strptime(periodo_item[1], '%m/%Y')
     
     ws['M5'] = 'Item Ativo'
     ws['M5'].fill = graybg
 
-    mes_atual = date.today().month
-    ano_atual = date.today().year
-
     for row, i in zip(ws.iter_rows(min_row = 6, max_row = lastrow, max_col = 12), range(6, lastrow + 1)):
         descr_cell = row[4]
+        cod_mat_cell = row[3]
+        unid_forn_cell = row[5]
         data_cell = row[11]
+        
         descr = descr_cell.value
-        data = data_cell.value
-        mes = int(data.split('/')[1])
-        ano = int(data.split('/')[2])
+        cod = cod_mat_cell.value
+        unid = unid_forn_cell.value
+        data = datetime.strptime(data_cell.value, '%d/%m/%Y')
         if any(x in descr for x in proibidas_item):
             ws[f'M{i}'] = 0
-        elif all(x in descr for x in deve_conter_item) and ano == 2020 and mes in range(mes_atual, 13):
-            ws[f'M{i}'] = 1
-        elif all(x in descr for x in deve_conter_item) and ano == 2021 and mes in range(mes_atual + 1):
+        elif all(x in descr for x in deve_conter_item) and (data_inicial <= data <= data_final) and (cod in cod_mat_item) and (unid in unid_forn_item):
             ws[f'M{i}'] = 1
         else:
             ws[f'M{i}'] = 0
