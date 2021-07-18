@@ -35,10 +35,13 @@ filtros = pd.read_excel('filtros.xlsx', converters = {'CÓDIGO DO MATERIAL':str}
 
 descr_padrao = {key:value for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO PADRÃO'])}
 deve_conter = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: DEVE CONTER'])}
-proibidas = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: NÃO DEVE CONTER'])}
+proibidas = {key:value.split(';') if isinstance(value, str) else [] for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: NÃO DEVE CONTER'])}
 unid_forn = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['UNIDADE DE FORNECIMENTO'])}
 cod_mat = {key:[int(cod) for cod in value.split(';')] if isinstance(value, str) else [] for key, value in zip(filtros['ITEM'], filtros['CÓDIGO DO MATERIAL'])}
 periodo = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['PERÍODO'])}
+
+a = 'hoje amanhã'
+any(x in a for x in [])
 
 for item in itens:
     wb = load_workbook(f'itens/{item}')
