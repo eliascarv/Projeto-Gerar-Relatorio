@@ -1,4 +1,3 @@
-from math import isnan
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
 from statistics import mean, stdev, median
@@ -88,7 +87,6 @@ for item in itens:
             else:
                 ws[f'M{i}'] = 0
             
-
     
     unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
 
