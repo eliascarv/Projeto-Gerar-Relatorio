@@ -1,6 +1,6 @@
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
-from statistics import mean, stdev, median
+from statistics import mean, pstdev, median
 from datetime import datetime
 from os import listdir
 import pandas as pd
@@ -100,7 +100,7 @@ for item in itens:
             valores.append(unit_values[i])
         
     media = mean(valores)
-    desvio = stdev(valores)
+    desvio = pstdev(valores)
     coeficiente = desvio / media
     mediana = median(valores)
     preco = mediana if coeficiente > 0.25 else media
