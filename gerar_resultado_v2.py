@@ -1,8 +1,10 @@
+from math import isnan
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Border, Side, PatternFill
 from statistics import mean, stdev, median
 from datetime import datetime
 from os import listdir
+import pandas as pd
 
 thin_border = Border(
     left = Side(style = 'thin'), 
@@ -30,16 +32,16 @@ def copy_sheet(ws_source, ws_destination):
             ws_destination.cell(row = i, column = j).value = c.value
 
 
-
 resultado = Workbook()
 itens = listdir('itens')
+filtros = pd.read_excel('filtros.xlsx', converters = {'CÓDIGO DO MATERIAL':str})
 
-descr_padrao = {'item1':'DESCRIÇÃO PADRÃO 1', 'item2':'DESCRIÇÃO PADRÃO 2'}
-deve_conter = {'item1':['CANETA', 'MARCA-TEXTO'], 'item2':['CANETA', 'MARCA-TEXTO']}
-proibidas = {'item1':['P3', 'P4'], 'item2':['P1', 'P2']}
-unid_forn = {'item1':['UNIDADE'], 'item2':['UNIDADE', 'CAIXA 12,00 UN']}
-cod_mat = {'item1':[279313], 'item2':[279313]}
-periodo = {'item1':['07/2020', '07/2021'], 'item2':['10/2020', '05/2021']}
+descr_padrao = {key:value for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO PADRÃO'])}
+deve_conter = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: DEVE CONTER'])}
+proibidas = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: NÃO DEVE CONTER'])}
+unid_forn = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['UNIDADE DE FORNECIMENTO'])}
+cod_mat = {key:[int(cod) for cod in value.split(';')] if isinstance(value, str) else [] for key, value in zip(filtros['ITEM'], filtros['CÓDIGO DO MATERIAL'])}
+periodo = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['PERÍODO'])}
 
 for item in itens:
     wb = load_workbook(f'itens/{item}')
@@ -75,10 +77,17 @@ for item in itens:
         data = datetime.strptime(data_cell.value, '%d/%m/%Y')
         if any(x in descr for x in proibidas_item):
             ws[f'M{i}'] = 0
-        elif all(x in descr for x in deve_conter_item) and (data_inicial <= data <= data_final) and (cod in cod_mat_item) and (unid in unid_forn_item):
-            ws[f'M{i}'] = 1
+        elif cod_mat_item:
+            if all(x in descr for x in deve_conter_item) and (data_inicial <= data <= data_final) and (cod in cod_mat_item) and (unid in unid_forn_item):
+                ws[f'M{i}'] = 1
+            else:
+                ws[f'M{i}'] = 0
         else:
-            ws[f'M{i}'] = 0
+            if all(x in descr for x in deve_conter_item) and (data_inicial <= data <= data_final) and (unid in unid_forn_item):
+                ws[f'M{i}'] = 1
+            else:
+                ws[f'M{i}'] = 0
+            
 
     
     unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
