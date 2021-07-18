@@ -20,7 +20,6 @@ def color_row(row_tuple, color):
         cell.fill = background
         cell.border = thin_border
 
-
 def copy_sheet(ws_source, ws_destination):
     mr = ws_source.max_row
     mc = ws_source.max_column
