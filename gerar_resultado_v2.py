@@ -76,7 +76,7 @@ for item in itens:
     unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
 
     valores = []
-    for row, i in zip(ws.iter_rows(min_row = 6, max_row = lastrow, min_col = 13, max_col = 13), range(0, lastrow-5)):
+    for row, i in zip(ws.iter_rows(min_row = 6, max_row = lastrow, min_col = 13, max_col = 13), range(0, lastrow - 5)):
         cell = row[0]
         ativo = cell.value
         if ativo == 1:
