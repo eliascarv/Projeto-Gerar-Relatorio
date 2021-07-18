@@ -104,18 +104,21 @@ for item in itens:
     coeficiente = desvio / media
     mediana = median(valores)
     preco = mediana if coeficiente > 0.25 else media
+    br_supply = preco * 1.11
 
     ws[f'A{lastrow + 2}'] = 'Média'
     ws[f'A{lastrow + 3}'] = 'Desvio'
     ws[f'A{lastrow + 4}'] = 'Coeficiente'
     ws[f'A{lastrow + 5}'] = 'Mediana'
     ws[f'A{lastrow + 6}'] = 'Preço'
+    ws[f'A{lastrow + 7}'] = 'Preço BR Supply'
 
     ws[f'B{lastrow + 2}'] = media
     ws[f'B{lastrow + 3}'] = desvio
     ws[f'B{lastrow + 4}'] = coeficiente
     ws[f'B{lastrow + 5}'] = mediana
     ws[f'B{lastrow + 6}'] = preco
+    ws[f'B{lastrow + 7}'] = br_supply
 
     ws_result = resultado.create_sheet(item_name)
     copy_sheet(ws, ws_result)
@@ -163,11 +166,13 @@ for item in itens:
     ws_result[f'A{lastrow + 4}'].border = thin_border
     ws_result[f'A{lastrow + 5}'].border = thin_border
     ws_result[f'A{lastrow + 6}'].border = thin_border
+    ws_result[f'A{lastrow + 7}'].border = thin_border
     ws_result[f'B{lastrow + 2}'].border = thin_border
     ws_result[f'B{lastrow + 3}'].border = thin_border
     ws_result[f'B{lastrow + 4}'].border = thin_border
     ws_result[f'B{lastrow + 5}'].border = thin_border
     ws_result[f'B{lastrow + 6}'].border = thin_border
+    ws_result[f'B{lastrow + 7}'].border = thin_border
 
 
 rm_sheet = resultado['Sheet']
