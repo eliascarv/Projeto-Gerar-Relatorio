@@ -40,8 +40,8 @@ unid_forn = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros
 cod_mat = {key:[int(cod) for cod in value.split(';')] if isinstance(value, str) else [] for key, value in zip(filtros['ITEM'], filtros['CÓDIGO DO MATERIAL'])}
 periodo = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['PERÍODO'])}
 
-a = 'hoje amanhã'
-any(x in a for x in [])
+# a = 'hoje amanhã'
+# any(x in a for x in [])
 
 for item in itens:
     wb = load_workbook(f'itens/{item}')
