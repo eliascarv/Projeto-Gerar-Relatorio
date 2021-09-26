@@ -19,12 +19,12 @@ flt_cod_mat = filtros['CÓDIGO DO MATERIAL']
 flt_periodo = filtros['PERÍODO']
 
 descr_padrao = {key: value.upper() for key, value in zip(flt_item, flt_descr_padrao)}
-obrigatorias = {key: create_filter(value) for key, value in zip(flt_item, flt_obrigatorias)}
+obrigatorias = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_obrigatorias)}
 deve_conter = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_deve_conter)}
 proibidas = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_proibidas)}
 unid_forn = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_unid_forn)}
 cod_mat = {key: create_filter(value, num = True) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_cod_mat)}
-periodo = {key: create_filter(value) for key, value in zip(flt_item, flt_periodo)}
+periodo = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_periodo)}
 
 for item in itens:
     wb = load_workbook(f'itens/{item}')
@@ -34,6 +34,7 @@ for item in itens:
     item_name = item[0:-5]
 
     descr_padrao_item = descr_padrao[item_name]
+    obrigatorias_item = obrigatorias[item_name]
     deve_conter_item = deve_conter[item_name]
     proibidas_item = proibidas[item_name]
     unid_forn_item = unid_forn[item_name]
@@ -42,8 +43,12 @@ for item in itens:
 
     ws['C1'] = descr_padrao_item
 
-    data_inicial = datetime.strptime(periodo_item[0], '%m/%Y')
-    data_final = datetime.strptime(periodo_item[1], '%m/%Y')
+    if periodo_item:
+        data_inicial = datetime.strptime(periodo_item[0], '%m/%Y')
+        data_final = datetime.strptime(periodo_item[1], '%m/%Y')
+    else:
+        data_inicial = datetime.min
+        data_final = datetime.max
     
     ws['M5'] = 'Item Ativo'
     ws['M5'].fill = graybg
@@ -54,20 +59,29 @@ for item in itens:
         unid_forn_cell = row[5]
         data_cell = row[11]
         
-        descr = descr_cell.value
+        descr = remove_acc(descr_cell.value).upper().strip()
         cod = cod_mat_cell.value
-        unid = unid_forn_cell.value
+        unid = remove_acc(unid_forn_cell.value).upper().strip()
         data = datetime.strptime(data_cell.value, '%d/%m/%Y')
 
         if any(x in descr for x in proibidas_item):
             ws[f'M{i}'] = 0
         elif cod_mat_item:
-            if all(x in descr for x in deve_conter_item) and (data_inicial <= data <= data_final) and (cod in cod_mat_item) and (unid in unid_forn_item):
+            if apply_filter(descr, obrigatorias_item, all) \
+                and apply_filter(descr, deve_conter_item, any) \
+                and apply_filter(unid, unid_forn_item, any) \
+                and (data_inicial <= data <= data_final) \
+                and (cod in cod_mat_item):
+
                 ws[f'M{i}'] = 1
             else:
                 ws[f'M{i}'] = 0
         else:
-            if all(x in descr for x in deve_conter_item) and (data_inicial <= data <= data_final) and (unid in unid_forn_item):
+            if apply_filter(descr, obrigatorias_item, all) \
+                and apply_filter(descr, deve_conter_item, any) \
+                and apply_filter(unid, unid_forn_item, any) \
+                and (data_inicial <= data <= data_final):
+
                 ws[f'M{i}'] = 1
             else:
                 ws[f'M{i}'] = 0

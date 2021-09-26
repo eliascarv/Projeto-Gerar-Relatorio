@@ -24,6 +24,12 @@ def create_filter(value: str, num: bool = False):
 
     return list(filters)
 
+def apply_filter(descr: str, words: list[str], func):
+    if words:
+        return func(x in descr for x in words)
+    else:
+        return True
+
 def color_row(row: tuple, color: str):
     background = PatternFill(start_color = color, fill_type = 'solid')
     for cell in row:
