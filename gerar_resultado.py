@@ -1,47 +1,30 @@
 from openpyxl import load_workbook, Workbook
-from openpyxl.styles import Border, Side, PatternFill
 from statistics import mean, pstdev, median
 from datetime import datetime
 from os import listdir
 import pandas as pd
-
-thin_border = Border(
-    left = Side(style = 'thin'), 
-    right = Side(style = 'thin'), 
-    top = Side(style = 'thin'), 
-    bottom = Side(style = 'thin')
-)
-
-graybg = PatternFill(start_color = 'cccccc', fill_type = "solid")
-
-def color_row(row_tuple, color):
-    background = PatternFill(start_color = color, fill_type = "solid")
-    for cell in row_tuple:
-        cell.fill = background
-        cell.border = thin_border
-
-def copy_sheet(ws_source, ws_destination):
-    mr = ws_source.max_row
-    mc = ws_source.max_column
-    for i in range (1, mr + 1):
-        for j in range (1, mc + 1):
-            c = ws_source.cell(row = i, column = j)
-            ws_destination.cell(row = i, column = j).value = c.value
-
+from funcs import *
 
 resultado = Workbook()
 itens = listdir('itens')
-filtros = pd.read_excel('filtros.xlsx', converters = {'CÓDIGO DO MATERIAL':str})
+filtros = pd.read_excel('filtros.xlsx', converters = {'CÓDIGO DO MATERIAL': str})
 
-descr_padrao = {key:value for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO PADRÃO'])}
-deve_conter = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: DEVE CONTER'])}
-proibidas = {key:value.split(';') if isinstance(value, str) else [] for key, value in zip(filtros['ITEM'], filtros['DESCRIÇÃO: NÃO DEVE CONTER'])}
-unid_forn = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['UNIDADE DE FORNECIMENTO'])}
-cod_mat = {key:[int(cod) for cod in value.split(';')] if isinstance(value, str) else [] for key, value in zip(filtros['ITEM'], filtros['CÓDIGO DO MATERIAL'])}
-periodo = {key:value.split(';') for key, value in zip(filtros['ITEM'], filtros['PERÍODO'])}
+flt_item = filtros['ITEM (NOME DO ARQUIVO)']
+flt_descr_padrao = filtros['DESCRIÇÃO PADRÃO']
+flt_obrigatorias = filtros['DESCRIÇÃO: PALAVRA(S) OBRIGATÓRIA(S)']
+flt_deve_conter = filtros['DESCRIÇÃO: DEVE CONTER (MIN 1)']
+flt_proibidas = filtros['DESCRIÇÃO: PALAVRA(S) PROIBIDAS(S)']
+flt_unid_forn = filtros['UNIDADE DE FORNECIMENTO']
+flt_cod_mat = filtros['CÓDIGO DO MATERIAL']
+flt_periodo = filtros['PERÍODO']
 
-# a = 'hoje amanhã'
-# any(x in a for x in [])
+descr_padrao = {key: value.upper() for key, value in zip(flt_item, flt_descr_padrao)}
+obrigatorias = {key: create_filter(value) for key, value in zip(flt_item, flt_obrigatorias)}
+deve_conter = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_deve_conter)}
+proibidas = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_proibidas)}
+unid_forn = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_unid_forn)}
+cod_mat = {key: create_filter(value, num = True) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_cod_mat)}
+periodo = {key: create_filter(value) for key, value in zip(flt_item, flt_periodo)}
 
 for item in itens:
     wb = load_workbook(f'itens/{item}')
