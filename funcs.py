@@ -10,12 +10,14 @@ thin_border = Border(
     bottom = Side(style = 'thin')
 )
 
-graybg = PatternFill(start_color = 'cccccc', fill_type = 'solid')
+gray_bg = PatternFill(start_color = 'cccccc', fill_type = 'solid')
 
+# Remove a acentuação de uma string
 def remove_acc(word: str):
     norm_word = normalize('NFKD', word).encode('ASCII', 'ignore').decode('ASCII')
     return norm_word
 
+# Cria o array de strings (filtros) a partir de uma string
 def create_filter(value: str, num: bool = False):
     temp_filters = remove_acc(value.upper()).split('|')
     filters = map(lambda x: x.strip(), temp_filters)
@@ -25,18 +27,21 @@ def create_filter(value: str, num: bool = False):
 
     return list(filters)
 
+# Aplica os filtros em uma descrição
 def apply_filter(descr: str, words: list[str], func):
     if words:
-        return func(x in descr for x in words)
+        return func(word in descr for word in words)
     else:
         return True
 
+# Colore toda uma linha da tabela
 def color_row(row: tuple, color: str):
     background = PatternFill(start_color = color, fill_type = 'solid')
     for cell in row:
         cell.fill = background
         cell.border = thin_border
 
+# Copia todos os elementos de uma work sheet para outra
 def copy_sheet(ws_source: Worksheet, ws_destination: Worksheet):
     mr = ws_source.max_row
     mc = ws_source.max_column
@@ -45,6 +50,7 @@ def copy_sheet(ws_source: Worksheet, ws_destination: Worksheet):
             c = ws_source.cell(row = i, column = j)
             ws_destination.cell(row = i, column = j).value = c.value
 
+# Ordena toda a tabela a partir dos valores de uma coluna
 def sort_col(ws: Worksheet, col: int, min_row: int, max_row:int, reverse: bool = True):
     col_values = []
     for row in range(min_row, max_row + 1):

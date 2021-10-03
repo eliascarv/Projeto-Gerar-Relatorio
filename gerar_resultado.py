@@ -18,6 +18,7 @@ flt_unid_forn = filtros['UNIDADE DE FORNECIMENTO']
 flt_cod_mat = filtros['CÓDIGO DO MATERIAL']
 flt_periodo = filtros['PERÍODO']
 
+# Criandos os dicts que irão conter os filtros para cada item
 descr_padrao = {key: value.upper() for key, value in zip(flt_item, flt_descr_padrao)}
 obrigatorias = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_obrigatorias)}
 deve_conter = {key: create_filter(value) if isinstance(value, str) else [] for key, value in zip(flt_item, flt_deve_conter)}
@@ -43,6 +44,7 @@ for item in itens:
 
     ws['C1'] = descr_padrao_item
 
+    # Tornado o filtro de período opcional
     if periodo_item:
         data_inicial = datetime.strptime(periodo_item[0], '%m/%Y')
         data_final = datetime.strptime(periodo_item[1], '%m/%Y')
@@ -51,8 +53,10 @@ for item in itens:
         data_final = datetime.max
     
     ws['M5'] = 'Item Ativo'
-    ws['M5'].fill = graybg
+    ws['M5'].fill = gray_bg
 
+    # Aplica os filtros a cada linha da tabela
+    # Classificando a linha em ativo (1) ou inativo (0)
     for row, i in zip(ws.iter_rows(min_row = 6, max_row = last_row, max_col = 12), range(6, last_row + 1)):
         descr_cell = row[4]
         cod_mat_cell = row[3]
@@ -64,6 +68,7 @@ for item in itens:
         unid = remove_acc(unid_forn_cell.value).upper().strip()
         data = datetime.strptime(data_cell.value, '%d/%m/%Y')
 
+        # Lógica de aplicação dos filtros
         if any(x in descr for x in proibidas_item):
             ws[f'M{i}'] = 0
         elif cod_mat_item:
@@ -86,12 +91,13 @@ for item in itens:
             else:
                 ws[f'M{i}'] = 0
 
-
+    # Reordena a tabela pela coluna dos itens ativos
     sort_col(ws, col = 13, min_row = 6, max_row = last_row)
 
+    # Salvando todos os valores unitários e convertendo-os para float
     unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{last_row}']]
 
-    # Salva os valores unitários ativos
+    # Salva os valores unitários ativos que serão usados nos cálculos
     valores = []
     for row, i in zip(ws['M6':f'M{last_row}'], range(0, last_row - 5)):
         cell = row[0]
@@ -99,7 +105,7 @@ for item in itens:
         if ativo == 1:
             valores.append(unit_values[i])
 
-        
+    # Calculando o preço final    
     media = mean(valores)
     desvio = pstdev(valores)
     coeficiente = desvio / media
@@ -121,12 +127,16 @@ for item in itens:
     ws[f'B{last_row + 6}'] = preco
     ws[f'B{last_row + 7}'] = br_supply
 
+    # Salvando o work sheet no arquivo resultado.xlsx
     ws_result = resultado.create_sheet(item_name)
     copy_sheet(ws, ws_result)
 
+    # Colorindo as linhas da tabela
     for row, i in zip(ws_result.iter_rows(min_row = 6, max_row = last_row, max_col = 13), range(0, last_row - 5)):
         cell_ativo = row[12]
         cell_valor = row[7]
+        # Nas tabelas originais os valores unitários estão no formato de texto
+        # Aqui eles são subtituidos por números
         cell_valor.value = unit_values[i]
         ativo = cell_ativo.value
         if ativo == 1:
@@ -134,19 +144,19 @@ for item in itens:
         else:
             color_row(row, 'fbe5d6')
 
-    ws_result['A5'].fill = graybg
-    ws_result['B5'].fill = graybg
-    ws_result['C5'].fill = graybg
-    ws_result['D5'].fill = graybg
-    ws_result['E5'].fill = graybg
-    ws_result['F5'].fill = graybg
-    ws_result['G5'].fill = graybg
-    ws_result['H5'].fill = graybg
-    ws_result['I5'].fill = graybg
-    ws_result['J5'].fill = graybg
-    ws_result['K5'].fill = graybg
-    ws_result['L5'].fill = graybg
-    ws_result['M5'].fill = graybg
+    ws_result['A5'].fill = gray_bg
+    ws_result['B5'].fill = gray_bg
+    ws_result['C5'].fill = gray_bg
+    ws_result['D5'].fill = gray_bg
+    ws_result['E5'].fill = gray_bg
+    ws_result['F5'].fill = gray_bg
+    ws_result['G5'].fill = gray_bg
+    ws_result['H5'].fill = gray_bg
+    ws_result['I5'].fill = gray_bg
+    ws_result['J5'].fill = gray_bg
+    ws_result['K5'].fill = gray_bg
+    ws_result['L5'].fill = gray_bg
+    ws_result['M5'].fill = gray_bg
 
     ws_result['A5'].border = thin_border
     ws_result['B5'].border = thin_border
@@ -175,7 +185,7 @@ for item in itens:
     ws_result[f'B{last_row + 6}'].border = thin_border
     ws_result[f'B{last_row + 7}'].border = thin_border
 
-
+# Removendo a work sheet vazia e salvando o arquivo resultado.xlsx
 rm_sheet = resultado['Sheet']
 resultado.remove(rm_sheet)
 resultado.save('resultado.xlsx')
