@@ -30,7 +30,7 @@ for item in itens:
     wb = load_workbook(f'itens/{item}')
     ws = wb.active
 
-    lastrow = ws.max_row
+    last_row = ws.max_row
     item_name = item[0:-5]
 
     descr_padrao_item = descr_padrao[item_name]
@@ -53,7 +53,7 @@ for item in itens:
     ws['M5'] = 'Item Ativo'
     ws['M5'].fill = graybg
 
-    for row, i in zip(ws.iter_rows(min_row = 6, max_row = lastrow, max_col = 12), range(6, lastrow + 1)):
+    for row, i in zip(ws.iter_rows(min_row = 6, max_row = last_row, max_col = 12), range(6, last_row + 1)):
         descr_cell = row[4]
         cod_mat_cell = row[3]
         unid_forn_cell = row[5]
@@ -87,12 +87,13 @@ for item in itens:
                 ws[f'M{i}'] = 0
 
 
-    sort_col(ws, col = 13, min_row = 6, max_row = lastrow)
+    sort_col(ws, col = 13, min_row = 6, max_row = last_row)
 
-    unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
+    unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{last_row}']]
 
+    # Salva os valores unitários ativos
     valores = []
-    for row, i in zip(ws.iter_rows(min_row = 6, max_row = lastrow, min_col = 13, max_col = 13), range(0, lastrow - 5)):
+    for row, i in zip(ws.iter_rows(min_row = 6, max_row = last_row, min_col = 13, max_col = 13), range(0, last_row - 5)):
         cell = row[0]
         ativo = cell.value
         if ativo == 1:
@@ -106,24 +107,24 @@ for item in itens:
     preco = mediana if coeficiente > 0.25 else media
     br_supply = preco * 1.11
 
-    ws[f'A{lastrow + 2}'] = 'Média'
-    ws[f'A{lastrow + 3}'] = 'Desvio'
-    ws[f'A{lastrow + 4}'] = 'Coeficiente'
-    ws[f'A{lastrow + 5}'] = 'Mediana'
-    ws[f'A{lastrow + 6}'] = 'Preço'
-    ws[f'A{lastrow + 7}'] = 'Preço BR Supply'
+    ws[f'A{last_row + 2}'] = 'Média'
+    ws[f'A{last_row + 3}'] = 'Desvio'
+    ws[f'A{last_row + 4}'] = 'Coeficiente'
+    ws[f'A{last_row + 5}'] = 'Mediana'
+    ws[f'A{last_row + 6}'] = 'Preço'
+    ws[f'A{last_row + 7}'] = 'Preço BR Supply'
 
-    ws[f'B{lastrow + 2}'] = media
-    ws[f'B{lastrow + 3}'] = desvio
-    ws[f'B{lastrow + 4}'] = coeficiente
-    ws[f'B{lastrow + 5}'] = mediana
-    ws[f'B{lastrow + 6}'] = preco
-    ws[f'B{lastrow + 7}'] = br_supply
+    ws[f'B{last_row + 2}'] = media
+    ws[f'B{last_row + 3}'] = desvio
+    ws[f'B{last_row + 4}'] = coeficiente
+    ws[f'B{last_row + 5}'] = mediana
+    ws[f'B{last_row + 6}'] = preco
+    ws[f'B{last_row + 7}'] = br_supply
 
     ws_result = resultado.create_sheet(item_name)
     copy_sheet(ws, ws_result)
 
-    for row, i in zip(ws_result.iter_rows(min_row = 6, max_row = lastrow, max_col = 13), range(0, lastrow - 5)):
+    for row, i in zip(ws_result.iter_rows(min_row = 6, max_row = last_row, max_col = 13), range(0, last_row - 5)):
         cell_ativo = row[12]
         cell_valor = row[7]
         cell_valor.value = unit_values[i]
@@ -161,18 +162,18 @@ for item in itens:
     ws_result['L5'].border = thin_border
     ws_result['M5'].border = thin_border
 
-    ws_result[f'A{lastrow + 2}'].border = thin_border
-    ws_result[f'A{lastrow + 3}'].border = thin_border
-    ws_result[f'A{lastrow + 4}'].border = thin_border
-    ws_result[f'A{lastrow + 5}'].border = thin_border
-    ws_result[f'A{lastrow + 6}'].border = thin_border
-    ws_result[f'A{lastrow + 7}'].border = thin_border
-    ws_result[f'B{lastrow + 2}'].border = thin_border
-    ws_result[f'B{lastrow + 3}'].border = thin_border
-    ws_result[f'B{lastrow + 4}'].border = thin_border
-    ws_result[f'B{lastrow + 5}'].border = thin_border
-    ws_result[f'B{lastrow + 6}'].border = thin_border
-    ws_result[f'B{lastrow + 7}'].border = thin_border
+    ws_result[f'A{last_row + 2}'].border = thin_border
+    ws_result[f'A{last_row + 3}'].border = thin_border
+    ws_result[f'A{last_row + 4}'].border = thin_border
+    ws_result[f'A{last_row + 5}'].border = thin_border
+    ws_result[f'A{last_row + 6}'].border = thin_border
+    ws_result[f'A{last_row + 7}'].border = thin_border
+    ws_result[f'B{last_row + 2}'].border = thin_border
+    ws_result[f'B{last_row + 3}'].border = thin_border
+    ws_result[f'B{last_row + 4}'].border = thin_border
+    ws_result[f'B{last_row + 5}'].border = thin_border
+    ws_result[f'B{last_row + 6}'].border = thin_border
+    ws_result[f'B{last_row + 7}'].border = thin_border
 
 
 rm_sheet = resultado['Sheet']
