@@ -85,8 +85,10 @@ for item in itens:
                 ws[f'M{i}'] = 1
             else:
                 ws[f'M{i}'] = 0
-            
-    
+
+
+    sort_col(ws, col = 13, min_row = 6, max_row = lastrow)
+
     unit_values = [float(cell[0].value.replace(',', '.')) for cell in ws['H6':f'H{lastrow}']]
 
     valores = []
@@ -95,6 +97,7 @@ for item in itens:
         ativo = cell.value
         if ativo == 1:
             valores.append(unit_values[i])
+
         
     media = mean(valores)
     desvio = pstdev(valores)
