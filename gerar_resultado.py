@@ -93,7 +93,7 @@ for item in itens:
 
     # Salva os valores unitários ativos
     valores = []
-    for row, i in zip(ws.iter_rows(min_row = 6, max_row = last_row, min_col = 13, max_col = 13), range(0, last_row - 5)):
+    for row, i in zip(ws['M6':f'M{last_row}'], range(0, last_row - 5)):
         cell = row[0]
         ativo = cell.value
         if ativo == 1:
